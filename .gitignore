@@ -1,4 +1,4 @@
-./dataset
+dataset/
 .kaggle-cli
 .env
 *x.csv
