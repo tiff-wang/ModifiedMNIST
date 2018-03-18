@@ -10,22 +10,19 @@ def normalizer(m):
 	return preprocessing.normalize(m, axis = 1, norm = 'l2')
 
 print('parsing train_x')
-x = np.loadtxt("./dataset/train_x.csv", delimiter=",") # load from text 
+x = np.loadtxt("./dataset/train_x_proc.csv", delimiter=",") # load from text 
 
 print('parsing train_y')
 y = np.loadtxt("./dataset/train_y.csv", delimiter=",") 
 
 print('parsing test_x')
-x_test = np.loadtxt("./dataset/test_x.csv", delimiter=",") 
+x_test = np.loadtxt("./dataset/test_x_proc.csv", delimiter=",") 
 
 x = x.reshape(-1, 64, 64) # reshape 
 y = y.reshape(-1, 1) 
 x_test = x_test.reshape(-1, 64, 64)
-#norm_x = normalizer(x)
-#norm_x_test = normalizer(x_test)
 print('data initialized')
 
-#first 100
 x = x.reshape(-1, 4096)
 classifier = svm.LinearSVC()
 classifier.fit(x,y)
