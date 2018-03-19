@@ -1,17 +1,29 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import keras 
+from keras import backend as K
+from keras.datasets import mnist
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Activation, Flatten
+from keras.optimizers import Adam
+from keras.layers.normalization import BatchNormalization
+from keras.utils import np_utils
+from keras.layers import Conv2D, MaxPooling2D, ZeroPadding2D, GlobalAveragePooling2D
+from keras.layers.advanced_activations import LeakyReLU 
+from keras.preprocessing.image import ImageDataGenerator
+
 from __future__ import print_function
 import keras
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D
-from keras.preprocessing.image import ImageDataGenerator
 from keras import backend as K
 import numpy as np
 import tensorflow as tf
 
 device_name = tf.test.gpu_device_name()
 print(device_name)
-
-
 
 def norm_input(x):
 	return (x - x.mean().astype(np.float32)/x.std().astype(np.float32))
@@ -20,9 +32,8 @@ def norm_input(x):
 # batch-size: number of samples that going to propagate through the network 
 batch_size = 64
 num_classes = 10
-epochs = 10
+epochs = 1
 validation_split = 0.05
-
 
 # input image dimensions
 img_rows, img_cols = 64, 64
@@ -36,7 +47,7 @@ x_test = np.loadtxt('dataset/test_x_proc.csv', delimiter = ',')
 y_test = np.loadtxt('predict_outputs/nabil.csv', delimiter = ',')
 
 # split train /validation
-split = int(x_train.shape[0] * 0.2)
+split = int(x_train.shape[0] * 0.05)
 x_valid = x_train[:split]
 y_valid = y_train[:split]
 
@@ -61,9 +72,6 @@ else:
     valid_reshaped = x_test.reshape(x_test.shape[0], img_rows, img_cols, 1)
     input_shape = (img_rows, img_cols, 1)
 
-print('x_train shape:', x_train.shape)
-print(train_reshaped.shape[0], 'train samples')
-print(test_reshaped.shape[0], 'test samples')
 
 model = Sequential()
 model.add(Conv2D(32, kernel_size=(3, 3),
@@ -95,16 +103,14 @@ gen = ImageDataGenerator(rotation_range=8, width_shift_range=0.08, shear_range=0
 
 valid_gen = ImageDataGenerator()
 
-train_generator = gen.flow(train_reshaped, y_train, batch_size=64)
-test_generator = test_gen.flow(valid_reshaped, y_valid, batch_size=64)
+train_generator = gen.flow(train_reshaped, y_train, batch_size=batch_size)
+test_generator = test_gen.flow(valid_reshaped, y_valid, batch_size=batch_size)
 
 
 
 # verbose = 1 // log output
-model.fit(train_generator,
-          validation_data = test_generator,
-          epochs=epochs,
-          verbose=1)
+model.fit_generator(train_generator, steps_per_epoch=train_reshaped.shape[0]//batch_size, epochs=epochs, 
+                    validation_data=test_generator, validation_steps=valid_reshaped.shape[0]//batch_size)
 
 score = model.evaluate(test_reshaped, y_test, verbose=0)
 print('Test loss:', score[0])
