@@ -16,7 +16,7 @@ def norm_input(x):
 
 
 # batch-size: number of samples that going to propagate through the network 
-batch_size = 64
+batch_size = 128
 num_classes = 10
 epochs = 16
 validation_split = 0.05
@@ -82,7 +82,7 @@ model.add(Dropout(0.20))
 model.add(Dense(num_classes, activation='softmax'))
 
 model.compile(loss=keras.losses.categorical_crossentropy,
-              optimizer=keras.optimizers.Adam(),
+              optimizer=keras.optimizers.Adadelta(),
               metrics=['accuracy'])
 
 
