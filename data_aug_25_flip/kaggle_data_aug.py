@@ -28,9 +28,12 @@ validation_split = 0.05
 # input image dimensions
 img_rows, img_cols = 64, 64
 
+import os 
+print(os.listdir('../dataset'))
+
 # load the data
-x_train = np.loadtxt('dataset/train_x_proc.csv', delimiter = ',')
-y_train = np.loadtxt('dataset/train_y.csv', delimiter = ',')
+x_train = np.loadtxt('../dataset/train_x_proc.csv', delimiter = ',')
+y_train = np.loadtxt('../dataset/train_y.csv', delimiter = ',')
 
 # use nabil's submission as test_y (94%)
 x_test = np.loadtxt('dataset/test_x_proc.csv', delimiter = ',')

@@ -22,15 +22,15 @@ def norm_input(x):
 # batch-size: number of samples that going to propagate through the network 
 batch_size = 64
 num_classes = 10
-epochs = 25
+epochs = 17
 validation_split = 0.05
 
 # input image dimensions
 img_rows, img_cols = 64, 64
 
 # load the data
-x_train = np.loadtxt('dataset/train_x_proc.csv', delimiter = ',')
-y_train = np.loadtxt('dataset/train_y.csv', delimiter = ',')
+x_train = np.loadtxt('../dataset/train_x_proc.csv', delimiter = ',')
+y_train = np.loadtxt('../dataset/train_y.csv', delimiter = ',')
 
 # use nabil's submission as test_y (94%)
 x_test = np.loadtxt('dataset/test_x_proc.csv', delimiter = ',')
@@ -89,7 +89,7 @@ model.compile(loss=keras.losses.categorical_crossentropy,
 
 
 gen = ImageDataGenerator(rotation_range=12, width_shift_range=0.1, shear_range=0.3,
-                         height_shift_range=0.1, zoom_range=0.08, horizontal_flip=True, vertical_flip=True)
+                         height_shift_range=0.1, zoom_range=0.08)
 
 test_gen = ImageDataGenerator()
 
