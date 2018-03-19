@@ -3,12 +3,14 @@ import keras
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D
+from keras.preprocessing.image import ImageDataGenerator
 from keras import backend as K
 import numpy as np
 import tensorflow as tf
 
 device_name = tf.test.gpu_device_name()
 print(device_name)
+
 
 
 def norm_input(x):
@@ -51,10 +53,12 @@ y_test = keras.utils.to_categorical(y_test, num_classes)
 if K.image_data_format() == 'channels_first':
     train_reshaped = x_train.reshape(x_train.shape[0], 1, img_rows, img_cols)
     test_reshaped = x_test.reshape(x_test.shape[0], 1, img_rows, img_cols)
+    valid_reshaped = x_test.reshape(x_test.shape[0], 1, img_rows, img_cols)
     input_shape = (1, img_rows, img_cols)
 else:
     train_reshaped = x_train.reshape(x_train.shape[0], img_rows, img_cols, 1)
     test_reshaped = x_test.reshape(x_test.shape[0], img_rows, img_cols, 1)
+    valid_reshaped = x_test.reshape(x_test.shape[0], img_rows, img_cols, 1)
     input_shape = (img_rows, img_cols, 1)
 
 print('x_train shape:', x_train.shape)
@@ -86,10 +90,19 @@ model.compile(loss=keras.losses.categorical_crossentropy,
               metrics=['accuracy'])
 
 
+gen = ImageDataGenerator(rotation_range=8, width_shift_range=0.08, shear_range=0.3,
+                         height_shift_range=0.08, zoom_range=0.08)
+
+valid_gen = ImageDataGenerator()
+
+train_generator = gen.flow(train_reshaped, y_train, batch_size=64)
+test_generator = test_gen.flow(valid_reshaped, y_valid, batch_size=64)
+
+
+
 # verbose = 1 // log output
-model.fit(train_reshaped, y_train,
-          validation_split = validation_split,
-          batch_size=batch_size,
+model.fit(train_generator,
+          validation_data = test_generator,
           epochs=epochs,
           verbose=1)
 
