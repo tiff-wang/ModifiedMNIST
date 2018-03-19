@@ -1,6 +1,6 @@
 import numpy as np 
 
-files = ['dataset/train_x.csv', 'dataset/test_x.csv']
+files = ['dataset/test_x.csv']
 
 for file in files: 
 	x = np.loadtxt(file, delimiter = ',')
