@@ -18,7 +18,7 @@ def norm_input(x):
 # batch-size: number of samples that going to propagate through the network 
 batch_size = 64
 num_classes = 10
-epochs = 10
+epochs = 16
 validation_split = 0.05
 
 
@@ -34,7 +34,7 @@ x_test = np.loadtxt('dataset/test_x_proc.csv', delimiter = ',')
 y_test = np.loadtxt('predict_outputs/nabil.csv', delimiter = ',')
 
 # split train /validation
-split = int(x_train.shape[0] * 0.2)
+split = int(x_train.shape[0] * 0.15)
 x_valid = x_train[:split]
 y_valid = y_train[:split]
 
@@ -82,7 +82,7 @@ model.add(Dropout(0.20))
 model.add(Dense(num_classes, activation='softmax'))
 
 model.compile(loss=keras.losses.categorical_crossentropy,
-              optimizer=keras.optimizers.Adadelta(),
+              optimizer=keras.optimizers.Adam(),
               metrics=['accuracy'])
 
 

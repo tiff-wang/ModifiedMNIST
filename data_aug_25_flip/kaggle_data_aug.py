@@ -1,7 +1,9 @@
+from __future__ import print_function
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import keras 
+import keras
+import tensorflow as tf
 from keras import backend as K
 from keras.datasets import mnist
 from keras.models import Sequential
@@ -12,24 +14,6 @@ from keras.utils import np_utils
 from keras.layers import Conv2D, MaxPooling2D, ZeroPadding2D, GlobalAveragePooling2D
 from keras.layers.advanced_activations import LeakyReLU 
 from keras.preprocessing.image import ImageDataGenerator
-
-from __future__ import print_function
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import keras
-import tensorflow as tf
-from keras import backend as K
-from keras.datasets import mnist
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Flatten
-from keras.layers import Conv2D, MaxPooling2D
-from keras import backend as K
-import numpy as np
-import tensorflow as tf
-
-device_name = tf.test.gpu_device_name()
-print(device_name)
 
 def norm_input(x):
 	return (x - x.mean().astype(np.float32)/x.std().astype(np.float32))
@@ -44,9 +28,12 @@ validation_split = 0.05
 # input image dimensions
 img_rows, img_cols = 64, 64
 
+import os 
+print(os.listdir('../dataset'))
+
 # load the data
-x_train = np.loadtxt('dataset/train_x_proc.csv', delimiter = ',')
-y_train = np.loadtxt('dataset/train_y.csv', delimiter = ',')
+x_train = np.loadtxt('../dataset/train_x_proc.csv', delimiter = ',')
+y_train = np.loadtxt('../dataset/train_y.csv', delimiter = ',')
 
 # use nabil's submission as test_y (94%)
 x_test = np.loadtxt('dataset/test_x_proc.csv', delimiter = ',')

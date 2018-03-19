@@ -1,7 +1,9 @@
+from __future__ import print_function
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import keras 
+import keras
+import tensorflow as tf
 from keras import backend as K
 from keras.datasets import mnist
 from keras.models import Sequential
@@ -13,24 +15,6 @@ from keras.layers import Conv2D, MaxPooling2D, ZeroPadding2D, GlobalAveragePooli
 from keras.layers.advanced_activations import LeakyReLU 
 from keras.preprocessing.image import ImageDataGenerator
 
-from __future__ import print_function
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import keras
-import tensorflow as tf
-from keras import backend as K
-from keras.datasets import mnist
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Flatten
-from keras.layers import Conv2D, MaxPooling2D
-from keras import backend as K
-import numpy as np
-import tensorflow as tf
-
-device_name = tf.test.gpu_device_name()
-print(device_name)
-
 def norm_input(x):
 	return (x - x.mean().astype(np.float32)/x.std().astype(np.float32))
 
@@ -38,15 +22,15 @@ def norm_input(x):
 # batch-size: number of samples that going to propagate through the network 
 batch_size = 64
 num_classes = 10
-epochs = 25
+epochs = 17
 validation_split = 0.05
 
 # input image dimensions
 img_rows, img_cols = 64, 64
 
 # load the data
-x_train = np.loadtxt('dataset/train_x_proc.csv', delimiter = ',')
-y_train = np.loadtxt('dataset/train_y.csv', delimiter = ',')
+x_train = np.loadtxt('../dataset/train_x_proc.csv', delimiter = ',')
+y_train = np.loadtxt('../dataset/train_y.csv', delimiter = ',')
 
 # use nabil's submission as test_y (94%)
 x_test = np.loadtxt('dataset/test_x_proc.csv', delimiter = ',')
@@ -105,7 +89,7 @@ model.compile(loss=keras.losses.categorical_crossentropy,
 
 
 gen = ImageDataGenerator(rotation_range=12, width_shift_range=0.1, shear_range=0.3,
-                         height_shift_range=0.1, zoom_range=0.08, horizontal_flip=True, vertical_flip=True)
+                         height_shift_range=0.1, zoom_range=0.08)
 
 test_gen = ImageDataGenerator()
 
