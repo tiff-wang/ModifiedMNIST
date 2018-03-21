@@ -2,13 +2,13 @@ import os
 import numpy as np
 import pandas as pd
 
-files = [file for file in os.listdir('Submissions') if ".csv" in file]
+files = [file for file in os.listdir('Ensemble') if ".csv" in file]
 
 res = pd.DataFrame()
 count = 0
 
 for file in files:
-	op = pd.read_csv('Submissions/' + file, header=None)
+	op = pd.read_csv('Ensemble/' + file, header=None)
 	op = op.iloc[1:]
 	op = op.drop([0], axis=1)
 	res[count] = op[1]
@@ -26,4 +26,4 @@ final = np.array(final)
 
 arr = np.arange(len(final))
 
-np.savetxt('Submissions/assembler_output.csv', np.dstack((arr, final))[0], "%d,%d", header = "Id,Label", comments='')
+np.savetxt('Ensemble/ensembler_output.csv', np.dstack((arr, final))[0], "%d,%d", header = "Id,Label", comments='')
