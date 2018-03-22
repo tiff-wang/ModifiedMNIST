@@ -26,7 +26,7 @@ x_test = pd.read_csv(URL + 'test_x_preproc.csv', header=None)
 x_test = np.array(x_test.as_matrix())
 
 # split validation and training data 
-split = len(x_train) * validation_split
+split = int(len(x_train) * validation_split)
 x_valid = x_train[:split]
 y_valid = y_train[:split]
 
