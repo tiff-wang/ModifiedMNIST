@@ -16,47 +16,42 @@ from keras.layers.advanced_activations import LeakyReLU
 from keras.preprocessing.image import ImageDataGenerator
 
 def norm_input(x):
-	return (x - x.mean().astype(np.float32)/x.std().astype(np.float32))
+    return (x - x.mean().astype(np.float32)/x.std().astype(np.float32))
 
 
 # batch-size: number of samples that going to propagate through the network 
 batch_size = 64
 num_classes = 10
 epochs = 17
-validation_split = 0.05
+validation_split = 0.02
 
 # input image dimensions
 img_rows, img_cols = 64, 64
 
-URL = 'https://s3.us-east-2.amazonaws.com/kaggle551/'
-
 # load the data
-#x_train = np.loadtxt('../dataset/train_x_proc.csv', delimiter = ',')
-#y_train = np.loadtxt('../dataset/train_y.csv', delimiter = ',')[:-1]
+print('loading data')
+x_train = np.loadtxt('../dataset/train_x_proc.csv', delimiter = ',')
+y_train = np.loadtxt('../dataset/train_y.csv', delimiter = ',')
 
-x_train = pd.read_csv(URL + 'train_x_preproc.csv', header=None)
-y_train = pd.read_csv(URL + 'train_y.csv', header=None)
-
-x_train = np.array(x_train.as_matrix())
-y_train = np.array(y_train[0])
-
-#x_test = np.loadtxt('../dataset/test_x_proc.csv', delimiter = ',')
-x_test = pd.read_csv(URL + 'test_x_preproc.csv', header=None)
-x_test = np.array(x_test.as_matrix())
+# use nabil's submission as test_y (94%)
+x_test = np.loadtxt('../dataset/test_x_proc.csv', delimiter = ',')
+y_test = np.loadtxt('../predict_outputs/nabil.csv', delimiter = ',')
 
 # split train /validation
-split = int(x_train.shape[0] * 0.05)
+split = int(x_train.shape[0] * validation_split)
 x_valid = x_train[:split]
 y_valid = y_train[:split]
 
 x_train = x_train[split:]
 y_train = y_train[split:]
 
+print('converting targets to categorical labels')
 # convert class vectors to binary class matrices
 y_train = keras.utils.to_categorical(y_train, num_classes)
 y_valid = keras.utils.to_categorical(y_valid, num_classes)
+y_test = keras.utils.to_categorical(y_test, num_classes)
 
-
+print('setting data format')
 if K.image_data_format() == 'channels_first':
     train_reshaped = x_train.reshape(x_train.shape[0], 1, img_rows, img_cols)
     test_reshaped = x_test.reshape(x_test.shape[0], 1, img_rows, img_cols)
@@ -68,7 +63,7 @@ else:
     valid_reshaped = x_valid.reshape(x_valid.shape[0], img_rows, img_cols, 1)
     input_shape = (img_rows, img_cols, 1)
 
-
+print('building model')
 model = Sequential()
 model.add(Conv2D(32, kernel_size=(3, 3),
                  activation='relu',
@@ -88,28 +83,36 @@ model.add(Flatten())
 model.add(Dense(512, activation='relu'))
 model.add(Dropout(0.20))
 model.add(Dense(num_classes, activation='softmax'))
-
+print(model.summary())
 model.compile(loss=keras.losses.categorical_crossentropy,
               optimizer=keras.optimizers.Adadelta(),
               metrics=['accuracy'])
 
 
-gen = ImageDataGenerator(rotation_range=12, width_shift_range=0.1, shear_range=0.3,
-                         height_shift_range=0.1, zoom_range=0.08)
+gen = ImageDataGenerator(rotation_range=40, width_shift_range=0.1, shear_range=0.3,
+                         height_shift_range=0.1, zoom_range=0.1)
 
 test_gen = ImageDataGenerator()
 
 train_generator = gen.flow(train_reshaped, y_train, batch_size=batch_size)
 test_generator = test_gen.flow(valid_reshaped, y_valid, batch_size=batch_size)
 
+
+print('starting training')
 # verbose = 1 // log output
 model.fit_generator(train_generator, steps_per_epoch=train_reshaped.shape[0]//batch_size, epochs=epochs, 
                     validation_data=test_generator, validation_steps=valid_reshaped.shape[0]//batch_size)
 
-score = model.evaluate(valid_reshaped, y_valid, verbose=0)
-score = (score[1] * 100)
+score = model.evaluate(test_reshaped, y_test, verbose=0)
+print('Test loss:', score[0])
+print('Test accuracy:', score[1])
+
+
 test_predict = model.predict(test_reshaped, verbose=1)
 test_predict = np.argmax(test_predict, axis=1)
 arr = np.arange(len(test_predict))
-np.savetxt('predict_output_{}.csv'.format(int(score)), np.dstack((arr, test_predict))[0], "%d,%d", header = "Id,Label", comments='')
+np.savetxt('predict_output.csv', test_predict)
+score = int((score[1] * 100) % 100)
+np.savetxt('predict_output_17_40rot_' + score + '.csv', np.dstack((arr, test_predict))[0], "%d,%d", header = "Id,Label", comments='')
+#np.savetxt('output_data_aug_17_.csv', test_predict)
 

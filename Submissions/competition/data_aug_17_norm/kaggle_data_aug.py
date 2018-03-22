@@ -7,7 +7,7 @@ import tensorflow as tf
 from keras import backend as K
 from keras.datasets import mnist
 from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation, Flatten
+from keras.layers import Dense, Dropout, Activation, Flatten, Lambda
 from keras.optimizers import Adam
 from keras.layers.normalization import BatchNormalization
 from keras.utils import np_utils
@@ -52,10 +52,15 @@ y_valid = y_train[:split]
 x_train = x_train[split:]
 y_train = y_train[split:]
 
+
 # convert class vectors to binary class matrices
 y_train = keras.utils.to_categorical(y_train, num_classes)
 y_valid = keras.utils.to_categorical(y_valid, num_classes)
 
+mean_x = x_train.mean().astype(np.float32)
+std_x = x_train.std().astype(np.float32)
+
+def norm_input(x): return (x-mean_x)/std_x
 
 if K.image_data_format() == 'channels_first':
     train_reshaped = x_train.reshape(x_train.shape[0], 1, img_rows, img_cols)
@@ -70,9 +75,9 @@ else:
 
 
 model = Sequential()
+model.add(Lambda(norm_input, input_shape=input_shape))
 model.add(Conv2D(32, kernel_size=(3, 3),
-                 activation='relu',
-                 input_shape=input_shape))
+                 activation='relu'))
 model.add(Conv2D(32, kernel_size=(3, 3),
                  activation='relu'))
 model.add(MaxPooling2D())
@@ -102,6 +107,8 @@ test_gen = ImageDataGenerator()
 train_generator = gen.flow(train_reshaped, y_train, batch_size=batch_size)
 test_generator = test_gen.flow(valid_reshaped, y_valid, batch_size=batch_size)
 
+
+
 # verbose = 1 // log output
 model.fit_generator(train_generator, steps_per_epoch=train_reshaped.shape[0]//batch_size, epochs=epochs, 
                     validation_data=test_generator, validation_steps=valid_reshaped.shape[0]//batch_size)
@@ -112,4 +119,3 @@ test_predict = model.predict(test_reshaped, verbose=1)
 test_predict = np.argmax(test_predict, axis=1)
 arr = np.arange(len(test_predict))
 np.savetxt('predict_output_{}.csv'.format(int(score)), np.dstack((arr, test_predict))[0], "%d,%d", header = "Id,Label", comments='')
-

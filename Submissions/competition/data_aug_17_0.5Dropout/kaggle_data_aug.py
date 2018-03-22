@@ -31,9 +31,6 @@ img_rows, img_cols = 64, 64
 URL = 'https://s3.us-east-2.amazonaws.com/kaggle551/'
 
 # load the data
-#x_train = np.loadtxt('../dataset/train_x_proc.csv', delimiter = ',')
-#y_train = np.loadtxt('../dataset/train_y.csv', delimiter = ',')[:-1]
-
 x_train = pd.read_csv(URL + 'train_x_preproc.csv', header=None)
 y_train = pd.read_csv(URL + 'train_y.csv', header=None)
 
@@ -51,6 +48,7 @@ y_valid = y_train[:split]
 
 x_train = x_train[split:]
 y_train = y_train[split:]
+
 
 # convert class vectors to binary class matrices
 y_train = keras.utils.to_categorical(y_train, num_classes)
@@ -79,14 +77,14 @@ model.add(MaxPooling2D())
 model.add(Conv2D(64, (3, 3), activation='relu'))
 model.add(Conv2D(64, (3, 3), activation='relu'))
 model.add(MaxPooling2D())
-model.add(Dropout(0.25))
+model.add(Dropout(0.5))
 model.add(Conv2D(128, (3, 3), activation='relu'))
 model.add(Conv2D(128, (3, 3), activation='relu'))
 model.add(MaxPooling2D())
-model.add(Dropout(0.25))
+model.add(Dropout(0.5))
 model.add(Flatten())
 model.add(Dense(512, activation='relu'))
-model.add(Dropout(0.20))
+model.add(Dropout(0.5))
 model.add(Dense(num_classes, activation='softmax'))
 
 model.compile(loss=keras.losses.categorical_crossentropy,
@@ -102,6 +100,8 @@ test_gen = ImageDataGenerator()
 train_generator = gen.flow(train_reshaped, y_train, batch_size=batch_size)
 test_generator = test_gen.flow(valid_reshaped, y_valid, batch_size=batch_size)
 
+
+
 # verbose = 1 // log output
 model.fit_generator(train_generator, steps_per_epoch=train_reshaped.shape[0]//batch_size, epochs=epochs, 
                     validation_data=test_generator, validation_steps=valid_reshaped.shape[0]//batch_size)
@@ -112,4 +112,5 @@ test_predict = model.predict(test_reshaped, verbose=1)
 test_predict = np.argmax(test_predict, axis=1)
 arr = np.arange(len(test_predict))
 np.savetxt('predict_output_{}.csv'.format(int(score)), np.dstack((arr, test_predict))[0], "%d,%d", header = "Id,Label", comments='')
+
 

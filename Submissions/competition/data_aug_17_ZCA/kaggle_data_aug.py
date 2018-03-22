@@ -44,6 +44,7 @@ y_train = np.array(y_train[0])
 x_test = pd.read_csv(URL + 'test_x_preproc.csv', header=None)
 x_test = np.array(x_test.as_matrix())
 
+
 # split train /validation
 split = int(x_train.shape[0] * 0.05)
 x_valid = x_train[:split]
@@ -51,6 +52,7 @@ y_valid = y_train[:split]
 
 x_train = x_train[split:]
 y_train = y_train[split:]
+
 
 # convert class vectors to binary class matrices
 y_train = keras.utils.to_categorical(y_train, num_classes)
@@ -95,12 +97,14 @@ model.compile(loss=keras.losses.categorical_crossentropy,
 
 
 gen = ImageDataGenerator(rotation_range=12, width_shift_range=0.1, shear_range=0.3,
-                         height_shift_range=0.1, zoom_range=0.08)
+                         height_shift_range=0.1, zoom_range=0.08, zca_whitening=True)
 
 test_gen = ImageDataGenerator()
 
 train_generator = gen.flow(train_reshaped, y_train, batch_size=batch_size)
 test_generator = test_gen.flow(valid_reshaped, y_valid, batch_size=batch_size)
+
+
 
 # verbose = 1 // log output
 model.fit_generator(train_generator, steps_per_epoch=train_reshaped.shape[0]//batch_size, epochs=epochs, 

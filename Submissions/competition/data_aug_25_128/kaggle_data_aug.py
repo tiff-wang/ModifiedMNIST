@@ -20,9 +20,9 @@ def norm_input(x):
 
 
 # batch-size: number of samples that going to propagate through the network 
-batch_size = 64
+batch_size = 128
 num_classes = 10
-epochs = 17
+epochs = 25
 validation_split = 0.05
 
 # input image dimensions
@@ -51,6 +51,7 @@ y_valid = y_train[:split]
 
 x_train = x_train[split:]
 y_train = y_train[split:]
+
 
 # convert class vectors to binary class matrices
 y_train = keras.utils.to_categorical(y_train, num_classes)
@@ -86,7 +87,7 @@ model.add(MaxPooling2D())
 model.add(Dropout(0.25))
 model.add(Flatten())
 model.add(Dense(512, activation='relu'))
-model.add(Dropout(0.20))
+model.add(Dropout(0.5))
 model.add(Dense(num_classes, activation='softmax'))
 
 model.compile(loss=keras.losses.categorical_crossentropy,
@@ -102,9 +103,12 @@ test_gen = ImageDataGenerator()
 train_generator = gen.flow(train_reshaped, y_train, batch_size=batch_size)
 test_generator = test_gen.flow(valid_reshaped, y_valid, batch_size=batch_size)
 
+
+
 # verbose = 1 // log output
 model.fit_generator(train_generator, steps_per_epoch=train_reshaped.shape[0]//batch_size, epochs=epochs, 
                     validation_data=test_generator, validation_steps=valid_reshaped.shape[0]//batch_size)
+
 
 score = model.evaluate(valid_reshaped, y_valid, verbose=0)
 score = (score[1] * 100)
@@ -112,4 +116,5 @@ test_predict = model.predict(test_reshaped, verbose=1)
 test_predict = np.argmax(test_predict, axis=1)
 arr = np.arange(len(test_predict))
 np.savetxt('predict_output_{}.csv'.format(int(score)), np.dstack((arr, test_predict))[0], "%d,%d", header = "Id,Label", comments='')
+
 
