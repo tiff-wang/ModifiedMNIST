@@ -28,11 +28,21 @@ validation_split = 0.05
 # input image dimensions
 img_rows, img_cols = 64, 64
 
-# load the data
-x_train = np.loadtxt('../dataset/train_x_preproc.csv', delimiter = ',')
-y_train = np.loadtxt('../dataset/train_y.csv', delimiter = ',')
+URL = 'https://s3.us-east-2.amazonaws.com/kaggle551/'
 
-x_test = np.loadtxt('dataset/test_x_preproc.csv', delimiter = ',')
+# load the data
+#x_train = np.loadtxt('../dataset/train_x_proc.csv', delimiter = ',')
+#y_train = np.loadtxt('../dataset/train_y.csv', delimiter = ',')[:-1]
+
+x_train = pd.read_csv(URL + 'train_x_preproc.csv', header=None)
+y_train = pd.read_csv(URL + 'train_y.csv', header=None)
+
+x_train = np.array(x_train.as_matrix())
+y_train = np.array(y_train[0])
+
+#x_test = np.loadtxt('../dataset/test_x_proc.csv', delimiter = ',')
+x_test = pd.read_csv(URL + 'test_x_preproc.csv', header=None)
+x_test = np.array(x_test.as_matrix())
 
 # split train /validation
 split = int(x_train.shape[0] * 0.05)
@@ -41,7 +51,6 @@ y_valid = y_train[:split]
 
 x_train = x_train[split:]
 y_train = y_train[split:]
-
 
 # convert class vectors to binary class matrices
 y_train = keras.utils.to_categorical(y_train, num_classes)
@@ -97,8 +106,10 @@ test_generator = test_gen.flow(valid_reshaped, y_valid, batch_size=batch_size)
 model.fit_generator(train_generator, steps_per_epoch=train_reshaped.shape[0]//batch_size, epochs=epochs, 
                     validation_data=test_generator, validation_steps=valid_reshaped.shape[0]//batch_size)
 
+score = model.evaluate(valid_reshaped, y_valid, verbose=0)
+score = (score[1] * 100)
 test_predict = model.predict(test_reshaped, verbose=1)
 test_predict = np.argmax(test_predict, axis=1)
 arr = np.arange(len(test_predict))
-np.savetxt('predict_output.csv', np.dstack((arr, test_predict))[0], "%d,%d", header = "Id,Label", comments='')
+np.savetxt('predict_output_{}.csv'.format(int(score)), np.dstack((arr, test_predict))[0], "%d,%d", header = "Id,Label", comments='')
 
