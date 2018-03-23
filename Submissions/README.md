@@ -2,7 +2,7 @@
 ## COMP 551 - Applied Machine Learning Project 4
 
 Frederic Ladouceur 2606
-Joshua Lau 
+Joshua Lau 260582760
 Tiffany Wang 260684152
 
 ### HOW TO RUN OUR CODE
@@ -11,7 +11,7 @@ This is a guideline to where to find the code for each part, and how to run it.
 
 
 ##### Preprocess 
-Directory: . 
+Directory: . /preprocess
 
 This code is in a jupyter notebook format. 
 The preprocessing file will generate new data csv files. 
@@ -35,7 +35,7 @@ The output file with the test prediction with be saved within the folder under t
 
 
 ##### 2) Neural Net
-Directory: ./nn
+Directory: ./NN
 
 This code is in a jupyter notebook format. 
 
