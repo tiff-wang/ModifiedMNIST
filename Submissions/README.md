@@ -22,6 +22,8 @@ However you can find them in the following links:
 - train_y: 'https://s3.us-east-2.amazonaws.com/kaggle551/train_y.csv'
 - test_x: 'https://s3.us-east-2.amazonaws.com/kaggle551/test_x_preproc.csv'
 
+A more thorough README is provided within the preprocess folder for better understanding of the code.
+
 
 ##### 1) Basic Linear Learner - SVM 
 Directory: ./svm 
