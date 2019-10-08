@@ -2,3 +2,8 @@ dataset/
 .kaggle-cli
 .env
 *x.csv
+
+data_aug*/
+conv_net_aug_17/
+kaggle_128/
+kaggle_16_adam/
